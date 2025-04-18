@@ -1,0 +1,22 @@
+# Web Framework
+fastapi==0.95.0
+uvicorn==0.21.0
+jinja2==3.1.2
+aiofiles==23.1.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.9
+aiosqlite==0.19.0
+
+# WebSocket
+websockets==11.0.2
+
+# WhatsApp Integration
+wa-automate-python==1.2.0
+selenium==4.9.0
+chromedriver-autoinstaller==0.4.0
+
+# Environment & Utils
+python-dotenv==1.0.0
+pydantic==1.10.7
