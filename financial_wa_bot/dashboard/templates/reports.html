@@ -63,12 +63,18 @@
     </div>
 </div>
 
+{% endblock %}
+
 {% block extra_scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Expense Breakdown Chart
-    const expenseCtx = document.getElementById('expenseBreakdownChart').getContext('2d');
-    new Chart(expenseCtx, {
+    try {
+        // Expense Breakdown Chart
+        const expenseCtx = document.getElementById('expenseBreakdownChart').getContext('2d');
+        if (window.expenseChart) {
+            window.expenseChart.destroy();
+        }
+        window.expenseChart = new Chart(expenseCtx, {
         type: 'doughnut',
         data: {
             labels: {{ expense_breakdown|map(attribute='category')|list|tojson }},
@@ -90,9 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Monthly Trend Chart
-    const trendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
-    new Chart(trendCtx, {
+        // Monthly Trend Chart
+        const trendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+        if (window.trendChart) {
+            window.trendChart.destroy();
+        }
+        window.trendChart = new Chart(trendCtx, {
         type: 'line',
         data: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
@@ -121,8 +130,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-    });
+        });
+    } catch (error) {
+        console.error('Error initializing charts:', error);
+    }
 });
 </script>
-{% endblock %}
 {% endblock %}
