@@ -1,40 +1,36 @@
 # WhatsApp Financial Planner Bot
 
-Sebuah bot WhatsApp untuk perencanaan keuangan pribadi dengan dashboard real-time. Bot ini membantu Anda mencatat dan menganalisis keuangan menggunakan bahasa Indonesia.
+A WhatsApp bot integrated with a web dashboard for personal financial management.
 
-## Fitur
+## Features
 
-- 💬 Integrasi dengan WhatsApp
-- 💰 Pencatatan pemasukan dan pengeluaran
-- 📊 Dashboard real-time untuk monitoring keuangan
-- 📈 Analisis dan laporan keuangan
-- 🎯 Perencanaan dan tracking budget
-- 🔔 Notifikasi dan pengingat
-- 📱 Responsive web interface
+- 💬 WhatsApp Integration for financial tracking
+- 📊 Interactive Web Dashboard
+- 💰 Transaction Management
+- 📈 Budget Tracking
+- 📋 Financial Reports
+- 🎯 Financial Goals
+- 🔄 Real-time Updates via WebSocket
 
-## Teknologi
+## Prerequisites
 
-- Python 3.8+
-- FastAPI
-- SQLAlchemy
-- WebSocket
-- TailwindCSS
-- Chart.js
+- Python 3.8 or higher
+- pip (Python package manager)
+- SQLite3
+- WhatsApp account
 
-## Instalasi
+## Installation
 
-1. Clone repository ini:
+1. Clone the repository:
 ```bash
 git clone https://github.com/yourusername/financial-wa-bot.git
 cd financial-wa-bot
 ```
 
-2. Buat virtual environment:
+2. Create and activate a virtual environment:
 ```bash
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# atau
-.\venv\Scripts\activate  # Windows
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install dependencies:
@@ -42,131 +38,142 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-4. Buat file `.env` di root directory:
+4. Create a `.env` file in the root directory with the following content:
 ```env
-DATABASE_URL=sqlite:///database/financial_bot.db
+# Web Server Configuration
 WEB_HOST=0.0.0.0
 WEB_PORT=8000
 DEBUG_MODE=True
+
+# Database Configuration
+DATABASE_URL=sqlite:///database/financial_bot.db
+
+# Security Configuration
 SECRET_KEY=your-secret-key-here
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Language Configuration
+LANGUAGE_MODEL=indonesian
+
+# Logging Configuration
+LOG_LEVEL=INFO
 ```
 
-5. Inisialisasi database:
+## Running the Application
+
+1. Initialize the database:
 ```bash
-python -c "from database.db_manager import db_manager; db_manager.init_db()"
+python -m financial_wa_bot.database.db_manager
 ```
 
-## Penggunaan
-
-1. Jalankan aplikasi:
+2. Start the server:
 ```bash
-python main.py
+cd financial_wa_bot
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-2. Scan QR code WhatsApp yang muncul untuk menghubungkan dengan WhatsApp Web
+3. Access the dashboard at `http://localhost:8000`
 
-3. Akses dashboard di `http://localhost:8000`
+## WhatsApp Bot Commands
 
-### Perintah WhatsApp
+The bot responds to the following commands:
 
-Bot memahami perintah dalam bahasa Indonesia (formal dan informal):
+### Expense Tracking
+- "catat pengeluaran [jumlah] [kategori] [deskripsi]"
+- "tambah pengeluaran [jumlah] [kategori] [deskripsi]"
+- "keluar [jumlah] [kategori] [deskripsi]"
 
-1. Catat Pengeluaran:
-   ```
-   catat pengeluaran 50000 untuk makan
-   keluar 50k buat makan
-   ```
+### Income Tracking
+- "catat pemasukan [jumlah] [kategori] [deskripsi]"
+- "tambah pemasukan [jumlah] [kategori] [deskripsi]"
+- "masuk [jumlah] [kategori] [deskripsi]"
 
-2. Catat Pemasukan:
-   ```
-   catat pemasukan 1000000 dari gaji
-   masuk 1jt dr gaji
-   ```
+### Balance Check
+- "cek saldo"
+- "saldo"
+- "balance"
 
-3. Cek Saldo:
-   ```
-   cek saldo
-   saldo
-   ```
+### Reports
+- "laporan"
+- "report"
 
-4. Lihat Laporan:
-   ```
-   laporan bulanan
-   report
-   ```
+### Budget Management
+- "atur budget [kategori] [jumlah]"
+- "set budget [kategori] [jumlah]"
 
-5. Atur Budget:
-   ```
-   atur budget 2000000 per bulan
-   set budget 2jt per bln
-   ```
+### Help
+- "bantuan"
+- "help"
+- "tolong"
 
-6. Buka Dashboard:
-   ```
-   buka dashboard
-   dashboard
-   ```
+### Dashboard Access
+- "buka dashboard"
+- "dashboard"
 
-## Struktur Proyek
+## Project Structure
 
 ```
 financial_wa_bot/
-├── config/                 # Konfigurasi aplikasi
-├── core/                  # Komponen inti (WhatsApp client, message handler)
-├── database/              # Model dan manager database
-├── features/              # Fitur utama (financial processor)
-├── dashboard/             # Frontend dashboard
-│   ├── static/           # Asset statis (CSS, JS, images)
-│   └── templates/        # Template HTML
-├── web/                  # Backend web (FastAPI, WebSocket)
-│   └── api/             # API endpoints
-├── utils/                # Utility functions
-├── tests/                # Unit tests
-├── requirements.txt      # Dependencies
-└── main.py              # Entry point
+├── config/                 # Configuration files
+├── core/                   # Core functionality
+├── dashboard/             # Web dashboard
+│   ├── static/           # Static files
+│   └── templates/        # HTML templates
+├── database/             # Database models and manager
+├── features/             # Feature implementations
+├── web/                  # Web server and API
+└── main.py              # Application entry point
 ```
 
-## API Endpoints
+## Development
 
-### Transactions
-- GET `/api/v1/transactions/{user_id}` - Get user transactions
-- GET `/api/v1/balance/{user_id}` - Get current balance
-- GET `/api/v1/budget/{user_id}` - Get budget status
-- GET `/api/v1/report/{user_id}` - Get financial report
-- GET `/api/v1/insights/{user_id}` - Get financial insights
-- GET `/api/v1/notifications/{user_id}` - Get notifications
+To contribute to the project:
 
-## Dashboard Features
+1. Create a new branch for your feature
+2. Make your changes
+3. Run tests
+4. Submit a pull request
 
-1. Overview:
-   - Saldo saat ini
-   - Total pemasukan & pengeluaran
-   - Status budget
+## Testing
 
-2. Visualisasi:
-   - Grafik kategori pengeluaran
-   - Tren pemasukan vs pengeluaran
-   - Progress budget
+Run the test suite:
+```bash
+python -m pytest tests/
+```
 
-3. Transaksi:
-   - Daftar transaksi terakhir
-   - Filter & pencarian
-   - Export data
+## Security Considerations
 
-4. Analisis:
-   - Laporan keuangan
-   - Insight & rekomendasi
-   - Prediksi pengeluaran
+1. Keep your `.env` file secure and never commit it to version control
+2. Regularly update dependencies
+3. Use strong passwords and secret keys
+4. Monitor server logs for suspicious activity
 
-## Kontribusi
+## Troubleshooting
 
-Silakan buat issue atau pull request untuk kontribusi.
+Common issues and solutions:
 
-## Lisensi
+1. **Database Connection Error**
+   - Check if SQLite is installed
+   - Verify database path in `.env`
+   - Ensure proper permissions
 
-MIT License - lihat file [LICENSE](LICENSE) untuk detail.
+2. **WhatsApp Connection Issues**
+   - Check internet connection
+   - Verify WhatsApp account status
+   - Ensure proper session management
 
-## Kontak
+3. **Server Won't Start**
+   - Check if port 8000 is available
+   - Verify Python version compatibility
+   - Check log files for errors
 
-- Email: your.email@example.com
-- GitHub: [@yourusername](https://github.com/yourusername)
+## Support
+
+For support, please:
+1. Check the documentation
+2. Search existing issues
+3. Create a new issue with detailed information
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
