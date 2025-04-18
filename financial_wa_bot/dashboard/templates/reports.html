@@ -1,0 +1,128 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Laporan - Financial Planner{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-semibold text-gray-900">Laporan Keuangan</h1>
+        <div class="flex space-x-3">
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <i class="fas fa-download mr-2"></i>Unduh Laporan
+            </button>
+        </div>
+    </div>
+
+    <!-- Monthly Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-medium text-gray-500">Total Pemasukan</h2>
+                <i class="fas fa-arrow-up text-green-500"></i>
+            </div>
+            <p class="mt-2 text-3xl font-bold text-gray-900">
+                Rp {{ "{:,.0f}".format(monthly_summary.income).replace(',', '.') }}
+            </p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-medium text-gray-500">Total Pengeluaran</h2>
+                <i class="fas fa-arrow-down text-red-500"></i>
+            </div>
+            <p class="mt-2 text-3xl font-bold text-gray-900">
+                Rp {{ "{:,.0f}".format(monthly_summary.expenses).replace(',', '.') }}
+            </p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-medium text-gray-500">Total Tabungan</h2>
+                <i class="fas fa-piggy-bank text-blue-500"></i>
+            </div>
+            <p class="mt-2 text-3xl font-bold text-gray-900">
+                Rp {{ "{:,.0f}".format(monthly_summary.savings).replace(',', '.') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Expense Breakdown Chart -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Breakdown Pengeluaran</h2>
+            <canvas id="expenseBreakdownChart" height="300"></canvas>
+        </div>
+
+        <!-- Monthly Trend Chart -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Tren Bulanan</h2>
+            <canvas id="monthlyTrendChart" height="300"></canvas>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Expense Breakdown Chart
+    const expenseCtx = document.getElementById('expenseBreakdownChart').getContext('2d');
+    new Chart(expenseCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ expense_breakdown|map(attribute='category')|list|tojson }},
+            datasets: [{
+                data: {{ expense_breakdown|map(attribute='amount')|list|tojson }},
+                backgroundColor: [
+                    '#4F46E5', '#7C3AED', '#EC4899', '#EF4444',
+                    '#F59E0B', '#10B981', '#3B82F6', '#6366F1'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+
+    // Monthly Trend Chart
+    const trendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+            datasets: [{
+                label: 'Pemasukan',
+                data: [3000000, 3500000, 4000000, 4500000, 5000000, 5000000],
+                borderColor: '#10B981',
+                tension: 0.4
+            }, {
+                label: 'Pengeluaran',
+                data: [2000000, 2200000, 2500000, 2800000, 3000000, 3000000],
+                borderColor: '#EF4444',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
