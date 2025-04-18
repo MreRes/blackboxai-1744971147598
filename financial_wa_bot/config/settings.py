@@ -10,9 +10,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # WhatsApp Bot Configuration
 WHATSAPP_CONFIG: Dict[str, Any] = {
-    "headless": True,
-    "qr_timeout": 60,
-    "authentication_timeout": 60,
+    "headless": os.getenv("WHATSAPP_CONFIG_HEADLESS", "True").lower() == "true",
+    "qr_timeout": int(os.getenv("WHATSAPP_CONFIG_QR_TIMEOUT", "60")),
+    "authentication_timeout": int(os.getenv("WHATSAPP_CONFIG_AUTH_TIMEOUT", "60")),
+    "executable_path": os.getenv("CHROME_EXECUTABLE_PATH", None),
+    "user_data_dir": os.path.join(BASE_DIR, ".wwebjs_auth"),
 }
 
 # Database Configuration
