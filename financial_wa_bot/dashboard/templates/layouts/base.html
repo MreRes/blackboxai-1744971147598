@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Financial Planner Dashboard{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGASURBVFhH7ZY9TsNAEIWfkUAUVEhQUFFR0yJxAA7ACTgEJ+AQHIBzcAgKGjoKKoQQBT0So2+GM8r6Z+2xnR9LfNLTrndm9s3urL2rzrAB7+EHnMKO0WP0Gr3HcAK/4Rt8hC2jx+g1eo/hCy7gK7yBTaPH6DV6j+EZfsIHuA+7Ro/Ra/QeA8/6Fp7BfdgHeoxeo/cYeNZsNL7jQ9g3eoxeo/cYeNYn8AhuwqHQY/QavcfAs2ZjncJNOBR6jF6j9xh41my0U7gJh0KP0Wv0HgPPmo12CjfhUOgxeo3eY+BZn8JjuA2HQo/Ra/QeA8+ajcYvlhsYCz1Gr9F7DDxrNtoxPIBjosfoNXqPgWfNRuM3Sz+YmOgxeo3eY+BZs9H4FXsOY6LH6DV6j4FnzUbjd+wljIkeo9foPQaeNRuNX7LXMBZnUK/RewyvcAkf4RUMDR/7Br9h9B4D/wl4CW/hHQwFH8vH8jnoPQYePC/BG/gMf+Aq8G95LB/Dx/I56P0XVdUfk+zGvyI1yZQAAAAASUVORK5CYII=">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-xl font-bold text-blue-600">Financial Planner</span>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <button class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="sr-only">View notifications</span>
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <button class="ml-3 p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="sr-only">User menu</span>
+                            <i class="fas fa-user-circle text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="flex">
+        <aside class="w-64 h-screen bg-white shadow-lg fixed">
+            <div class="h-full px-3 py-4 overflow-y-auto">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/dashboard" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-home w-6"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/transactions" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-exchange-alt w-6"></i>
+                            <span>Transaksi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/budget" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-wallet w-6"></i>
+                            <span>Budget</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/reports" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-chart-bar w-6"></i>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/goals" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-bullseye w-6"></i>
+                            <span>Target Keuangan</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-64 flex-1 p-8">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- WebSocket Connection -->
+    <script>
+        let ws;
+        const userId = '{{ user.id }}';
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws/${userId}`);
+            
+            ws.onopen = function() {
+                console.log('WebSocket connected');
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            ws.onclose = function() {
+                console.log('WebSocket disconnected');
+                // Try to reconnect in 5 seconds
+                setTimeout(connectWebSocket, 5000);
+            };
+        }
+
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'transaction':
+                    updateTransactions(data.data);
+                    break;
+                case 'balance':
+                    updateBalance(data.data);
+                    break;
+                case 'budget':
+                    updateBudget(data.data);
+                    break;
+                case 'notification':
+                    showNotification(data.data);
+                    break;
+            }
+        }
+
+        // Connect WebSocket when page loads
+        window.addEventListener('load', connectWebSocket);
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
